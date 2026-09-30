@@ -1,0 +1,24 @@
+{
+  "name": "neon-market",
+  "private": true,
+  "version": "1.0.0",
+  "description": "NEON MARKET — food marketplace: React client + Node.js API",
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "setup": "npm install && npm run db:setup -w server",
+    "dev": "concurrently -n api,web -c green,cyan \"npm run dev -w server\" \"npm run dev -w client\"",
+    "build": "npm run build -w server && npm run build -w client",
+    "start": "npm run start -w server",
+    "test": "npm test -w server && npm run typecheck -w client",
+    "lint": "npm run typecheck -w server && npm run typecheck -w client"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.4"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

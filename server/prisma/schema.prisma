@@ -1,0 +1,187 @@
+// NEON MARKET — data model.
+// SQLite for local development; switch `provider` to "postgresql" and DATABASE_URL for production.
+// SQLite has no enums or scalar lists, so statuses are strings and lists are JSON-encoded strings.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id       String    @id
+  name     String
+  emoji    String
+  icon     String
+  tint     String
+  sort     Int       @default(0)
+  products Product[]
+}
+
+model Product {
+  id          Int          @id @default(autoincrement())
+  name        String
+  categoryId  String
+  category    Category     @relation(fields: [categoryId], references: [id])
+  price       Int
+  oldPrice    Int?
+  unit        String
+  emoji       String
+  tags        String       @default("[]") // JSON string[]
+  country     String
+  kcal        Int
+  stock       Int
+  badge       String       @default("") // "" | "Хит" | "Sale" | "New"
+  weight      Float        @default(0.3) // kg, used for delivery quotes
+  description String       @default("")
+  barcode     String       @unique
+  active      Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  reviews     Review[]
+  recipeItems RecipeItem[]
+}
+
+model Recipe {
+  id       String       @id
+  title    String
+  emoji    String
+  time     Int
+  kcal     Int
+  level    String
+  portions Int
+  discount Float
+  tint     String
+  steps    String       @default("[]") // JSON string[]
+  sort     Int          @default(0)
+  items    RecipeItem[]
+}
+
+model RecipeItem {
+  id        Int     @id @default(autoincrement())
+  recipeId  String
+  recipe    Recipe  @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  qty       Int     @default(1)
+}
+
+model User {
+  id            Int       @id @default(autoincrement())
+  phone         String    @unique
+  name          String    @default("")
+  email         String    @default("")
+  loyaltyCard   String    @unique
+  bonusBalance  Int       @default(0)
+  lifetimeSpend Int       @default(0)
+  welcomeGiven  Boolean   @default(false)
+  prefs         String    @default("{}") // JSON: saved delivery / payment preferences
+  createdAt     DateTime  @default(now())
+  orders        Order[]
+  reviews       Review[]
+  bonusTx       BonusTx[]
+}
+
+model SmsCode {
+  id        Int      @id @default(autoincrement())
+  phone     String
+  codeHash  String
+  expiresAt DateTime
+  attempts  Int      @default(0)
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([phone, createdAt])
+}
+
+model BonusTx {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  delta     Int
+  reason    String
+  orderId   String?
+  createdAt DateTime @default(now())
+}
+
+model PromoCode {
+  code        String  @id
+  type        String // "percent" | "fixed" | "delivery"
+  value       Int     @default(0)
+  minSubtotal Int     @default(0)
+  label       String
+  active      Boolean @default(true)
+}
+
+model Order {
+  id             String               @id
+  userId         Int?
+  user           User?                @relation(fields: [userId], references: [id])
+  // awaiting_payment | new | picking | transit | done | cancelled
+  status         String               @default("new")
+  // pending | paid | failed | cod | refunded
+  paymentStatus  String               @default("pending")
+  paymentMethod  String // card | apple | google | cash
+  paymentTx      String?
+  paymentMask    String?
+  customerName   String
+  customerPhone  String
+  customerEmail  String               @default("")
+  subtotal       Int
+  bundleDiscount Int                  @default(0)
+  promoCode      String?
+  promoDiscount  Int                  @default(0)
+  bonusSpent     Int                  @default(0)
+  bonusEarned    Int                  @default(0)
+  bonusCredited  Boolean              @default(false)
+  deliveryType   String // np | courier | pickup
+  deliveryCost   Int                  @default(0)
+  deliveryLabel  String
+  deliveryEta    String               @default("")
+  deliveryData   String               @default("{}") // JSON
+  total          Int
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  items          OrderItem[]
+  history        OrderStatusHistory[]
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId Int?
+  name      String
+  emoji     String
+  price     Int
+  qty       Int
+  bundle    String?
+}
+
+model OrderStatusHistory {
+  id        Int      @id @default(autoincrement())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  status    String
+  createdAt DateTime @default(now())
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId    Int?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  author    String
+  rating    Int
+  text      String
+  emojis    String   @default("[]") // JSON string[]
+  verified  Boolean  @default(false)
+  status    String   @default("pending") // pending | approved
+  flagged   Boolean  @default(false)
+  likes     Int      @default(0)
+  createdAt DateTime @default(now())
+}
