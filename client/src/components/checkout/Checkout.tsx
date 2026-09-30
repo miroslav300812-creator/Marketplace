@@ -101,18 +101,18 @@ export function Checkout() {
     <Overlay open={open} onClose={close} label="Оформление заказа" z={100} className="md:max-w-6xl !h-[96vh] md:!h-auto flex flex-col" closeOnBackdrop={false}>
       <div className="px-5 md:px-8 pt-5 pb-4 border-b hairline">
         <div className="flex items-center justify-between gap-3">
-          <h3 className="font-display font-bold text-xl">Оформление заказа</h3>
+          <h3 className="font-display text-xl">Оформление заказа</h3>
           <div className="flex items-center gap-2">
-            {restored && <span className="fade-in flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full c-cyan" style={{ background: 'rgba(34,227,255,.1)', boxShadow: '0 0 0 1px rgba(34,227,255,.5),0 0 20px -4px rgba(34,227,255,.7)' }}><DatabaseBackup className="w-3.5 h-3.5" />Данные восстановлены</span>}
+            {restored && <span className="fade-in flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full glass c-ink2"><DatabaseBackup className="w-3.5 h-3.5" />Данные восстановлены</span>}
             <CloseBtn onClick={close} />
           </div>
         </div>
         <div className="mt-4 grid grid-cols-3 gap-2">
           {['Контакты', 'Доставка', 'Оплата'].map((s, i) => (
             <button key={s} onClick={() => go(i + 1)} className="text-left" aria-current={step === i + 1 ? 'step' : undefined}>
-              <div className={clsx('h-1.5 rounded-full tr', step > i + 1 ? 'bg-[var(--lime)]' : step === i + 1 ? 'bg-[var(--lime)] shadow-[0_0_14px_rgba(198,255,61,.8)]' : 'bg-white/10')} />
-              <div className={clsx('mt-2 text-xs font-bold flex items-center gap-1.5', step >= i + 1 ? 'text-white' : 'c-ink3')}>
-                <span className={clsx('w-5 h-5 rounded-full grid place-items-center text-[10px]', step > i + 1 ? 'bg-lime' : 'border border-white/20')}>{step > i + 1 ? <Check className="w-3 h-3" strokeWidth={3} /> : i + 1}</span>{s}
+              <div className={clsx('h-1.5 rounded-full tr', step > i + 1 ? 'bg-[var(--lime)]' : step === i + 1 ? 'bg-[var(--lime)] shadow-[0_0_14px_var(--stroke-2)]' : 'bg-[var(--track)]')} />
+              <div className={clsx('mt-2 text-xs font-medium flex items-center gap-1.5', step >= i + 1 ? 'text-[var(--ink)]' : 'c-ink3')}>
+                <span className={clsx('w-5 h-5 rounded-full grid place-items-center text-[10px]', step > i + 1 ? 'bg-lime' : 'border border-[var(--stroke-2)]')}>{step > i + 1 ? <Check className="w-3 h-3" strokeWidth={3} /> : i + 1}</span>{s}
               </div>
             </button>
           ))}
@@ -124,7 +124,7 @@ export function Checkout() {
           <div className="p-5 md:p-8 min-w-0">
             {step === 1 && (
               <div className="fade-in">
-                <h4 className="font-display font-bold text-lg mb-4">Контактные данные</h4>
+                <h4 className="font-display text-lg mb-4">Контактные данные</h4>
                 <div className="grid sm:grid-cols-2 gap-3">
                   <Field label="Имя и фамилия" error={errors.name}><input value={profile.name} onChange={e => setProfile({ name: e.target.value })} className={clsx('field', errors.name && 'err', restored && profile.name && 'restored')} placeholder="Тарас Шевченко" autoComplete="name" /></Field>
                   <Field label="E-mail для чека (необязательно)" error={errors.email}><input value={profile.email} onChange={e => setProfile({ email: e.target.value })} type="email" className={clsx('field', errors.email && 'err', restored && profile.email && 'restored')} placeholder="you@mail.com" autoComplete="email" /></Field>
@@ -135,16 +135,16 @@ export function Checkout() {
             {step === 2 && <div className="fade-in"><DeliveryStep errors={errors} restored={restored} quote={quote} /></div>}
             {step === 3 && (
               <div className="fade-in">
-                <h4 className="font-display font-bold text-lg mb-4">Способ оплаты</h4>
+                <h4 className="font-display text-lg mb-4">Способ оплаты</h4>
                 <div className="grid sm:grid-cols-2 gap-2" role="radiogroup">
                   {METHODS.map(([id, Icon, t, sub]) => (
-                    <button key={id} role="radio" aria-checked={profile.payMethod === id} onClick={() => { setProfile({ payMethod: id }); sfx.click(); }} className={clsx('rounded-2xl p-4 text-left border flex items-center gap-3 tr', profile.payMethod === id ? 'ring-neon border-transparent bg-[rgba(198,255,61,.08)]' : 'hairline bg-black/20 hover:bg-white/5')}>
-                      <span className={clsx('w-11 h-11 rounded-xl grid place-items-center', profile.payMethod === id ? 'bg-lime' : 'bg-white/5 c-ink2')}><Icon className="w-5 h-5" /></span>
-                      <span><span className="block font-bold text-sm">{t}</span><span className="block text-[11px] c-ink3">{sub}</span></span>
+                    <button key={id} role="radio" aria-checked={profile.payMethod === id} onClick={() => { setProfile({ payMethod: id }); sfx.click(); }} className={clsx('rounded-[24px] p-4 text-left border flex items-center gap-3 tr', profile.payMethod === id ? 'ring-neon border-transparent bg-[var(--hover)]' : 'hairline well hover-soft')}>
+                      <span className={clsx('w-11 h-11 rounded-[16px] grid place-items-center', profile.payMethod === id ? 'bg-lime' : 'well c-ink2')}><Icon className="w-5 h-5" /></span>
+                      <span><span className="block font-medium text-sm">{t}</span><span className="block text-[11px] c-ink3">{sub}</span></span>
                     </button>
                   ))}
                 </div>
-                <div className="mt-5 rounded-2xl p-4 bg-black/20 border hairline text-sm space-y-2 c-ink2">
+                <div className="mt-5 rounded-[24px] p-4 well text-sm space-y-2 c-ink2">
                   <div className="flex items-center gap-2"><UserRound className="w-4 h-4 c-lime" />{profile.name} · {user?.phone}</div>
                   <div className="flex items-start gap-2"><MapPin className="w-4 h-4 c-lime mt-0.5 shrink-0" />{DELIVERY_LABEL[profile.delivery.type]}: {d?.label ?? '—'}</div>
                   <div className="flex items-center gap-2"><Clock className="w-4 h-4 c-lime" />Ожидаемое время: {d?.eta ?? '—'}</div>
@@ -154,8 +154,8 @@ export function Checkout() {
             )}
           </div>
 
-          <aside className="p-5 md:p-6 border-t md:border-t-0 md:border-l hairline" style={{ background: 'rgba(4,8,22,.45)' }}>
-            <div className="font-bold text-sm mb-3 flex items-center justify-between"><span>Ваш заказ</span><span className="c-ink3 font-mono text-xs">{lines.reduce((s, l) => s + l.qty, 0)} шт.</span></div>
+          <aside className="p-5 md:p-6 border-t md:border-t-0 md:border-l hairline" >
+            <div className="font-medium text-sm mb-3 flex items-center justify-between"><span>Ваш заказ</span><span className="c-ink3 font-mono text-xs">{lines.reduce((s, l) => s + l.qty, 0)} шт.</span></div>
             <div className="space-y-2 max-h-48 overflow-auto thin-scroll pr-1">
               {quote?.lines.map((l, i) => <div key={i} className="flex items-center gap-2.5 text-sm"><span className="text-xl">{l.emoji}</span><span className="flex-1 min-w-0 truncate c-ink2">{l.name} × {l.qty}</span><span className="font-mono text-xs">{money(l.sum - l.disc)}</span></div>)}
             </div>
@@ -171,12 +171,12 @@ export function Checkout() {
             ) : <div className="space-y-2">{[0, 1, 2].map(n => <div key={n} className="skel h-4" />)}</div>}
             {error && step > 1 && <div className="text-xs c-pink font-semibold mt-2">{error}</div>}
             <div className="flex items-end justify-between mt-4">
-              <div><div className="text-xs c-ink3 flex items-center gap-2">К оплате {loading && <Spinner className="!w-3 !h-3" />}</div><div className="font-display font-bold text-3xl">{quote ? money(quote.total) : '…'}</div></div>
-              {quote && <div className="text-right text-xs font-bold c-lime">+{quote.bonusEarn} бонусов</div>}
+              <div><div className="text-xs c-ink3 flex items-center gap-2">К оплате {loading && <Spinner className="!w-3 !h-3" />}</div><div className="font-display text-3xl">{quote ? money(quote.total) : '…'}</div></div>
+              {quote && <div className="text-right text-xs font-medium c-lime">+{quote.bonusEarn} бонусов</div>}
             </div>
             <div className="mt-5 flex gap-2">
-              {step > 1 && <button onClick={() => { setStep(step - 1); sfx.click(); }} className="btn-ghost rounded-2xl w-14 grid place-items-center" aria-label="Назад"><ArrowLeft className="w-5 h-5" /></button>}
-              <button onClick={next} disabled={placing || (step === 3 && (!quote || !d || loading))} className="btn-neon flex-1 rounded-2xl py-4 flex items-center justify-center gap-2">
+              {step > 1 && <button onClick={() => { setStep(step - 1); sfx.click(); }} className="btn-ghost rounded-full w-14 grid place-items-center" aria-label="Назад"><ArrowLeft className="w-5 h-5" /></button>}
+              <button onClick={next} disabled={placing || (step === 3 && (!quote || !d || loading))} className="btn-neon flex-1 rounded-full py-4 flex items-center justify-center gap-2">
                 {placing ? <Spinner dark /> : <>{step < 3 ? 'Далее' : profile.payMethod === 'cash' ? `Подтвердить · ${money(quote?.total ?? 0)}` : `Оплатить ${money(quote?.total ?? 0)}`}<ArrowRight className="w-5 h-5" /></>}
               </button>
             </div>

@@ -16,7 +16,7 @@ type Stats = {
   hourly: { h: number; rev: number; n: number }[]; top: { productId: number; name: string; emoji: string; qty: number; rev: number }[];
   byStatus: { status: string; n: number }[]; lowStock: Product[]; pendingReviews: number;
 };
-const STATUS_COLORS: Record<string, string> = { awaiting_payment: '#fcee0a', new: '#22e3ff', picking: '#fcee0a', transit: '#b49bff', done: '#c6ff3d', cancelled: '#ff3d81' };
+const STATUS_COLORS: Record<string, string> = { awaiting_payment: 'var(--ice)', new: 'var(--ink-3)', picking: 'var(--ink-2)', transit: 'var(--ink-2)', done: 'var(--ink)', cancelled: 'var(--danger)' };
 const FLOW = ['new', 'picking', 'transit', 'done'];
 const toastErr = (e: unknown) => { sfx.error(); useUi.getState().toast({ type: 'err', msg: (e as Error).message }); };
 
@@ -29,12 +29,12 @@ function Login({ onDone }: { onDone: () => void }) {
   };
   return (
     <div className="min-h-screen grid place-items-center p-4">
-      <form onSubmit={e => { e.preventDefault(); void submit(); }} className="panel rounded-3xl p-6 w-full max-w-sm">
-        <div className="flex items-center gap-3 mb-5"><span className="w-10 h-10 rounded-xl grid place-items-center bg-[var(--yellow)] text-black"><Terminal className="w-5 h-5" /></span><div><div className="font-display font-bold">NEON Admin</div><div className="text-xs c-ink3">Вход для персонала</div></div></div>
+      <form onSubmit={e => { e.preventDefault(); void submit(); }} className="panel rounded-[30px] p-6 w-full max-w-sm">
+        <div className="flex items-center gap-3 mb-5"><span className="w-10 h-10 rounded-[16px] grid place-items-center bg-lime"><Terminal className="w-5 h-5" /></span><div><div className="font-display">NEON Admin</div><div className="text-xs c-ink3">Вход для персонала</div></div></div>
         <input type="password" value={pw} onChange={e => setPw(e.target.value)} className={clsx('field', err && 'err')} placeholder="Пароль администратора" autoFocus autoComplete="current-password" aria-label="Пароль" />
         {err && <div className="text-xs c-pink font-semibold mt-2">{err}</div>}
-        <button disabled={busy || !pw} className="btn-neon w-full rounded-xl py-3 mt-4 grid place-items-center">{busy ? <Spinner dark /> : 'Войти'}</button>
-        <Link to="/" className="block text-center text-xs c-ink3 hover:text-white mt-4">← В магазин</Link>
+        <button disabled={busy || !pw} className="btn-neon w-full rounded-full py-3 mt-4 grid place-items-center">{busy ? <Spinner dark /> : 'Войти'}</button>
+        <Link to="/" className="block text-center text-xs c-ink3 hover:text-[var(--ink)] mt-4">← В магазин</Link>
       </form>
     </div>
   );
@@ -57,23 +57,23 @@ function Chart({ hourly }: { hourly: Stats['hourly'] }) {
   return (
     <div className="relative mt-4" onMouseMove={move} onMouseLeave={() => setHover(null)}>
       <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto block" role="img" aria-label="Выручка по часам за сегодня">
-        {[0, 1, 2, 3, 4].map(i => { const v = max * i / 4, y = T + ph - ph * i / 4; return <g key={i}><line x1={L} x2={W - R} y1={y} y2={y} stroke={`rgba(255,255,255,${i ? 0.06 : 0.16})`} /><text x={L - 8} y={y + 3.5} textAnchor="end" fontSize={10} fill="#6b7598" fontFamily="JetBrains Mono, monospace">{v >= 1000 ? (v / 1000).toFixed(v % 1000 ? 1 : 0) + 'k' : Math.round(v)}</text></g>; })}
+        {[0, 1, 2, 3, 4].map(i => { const v = max * i / 4, y = T + ph - ph * i / 4; return <g key={i}><line x1={L} x2={W - R} y1={y} y2={y} stroke="var(--ink)" strokeOpacity={i ? 0.06 : 0.16} /><text x={L - 8} y={y + 3.5} textAnchor="end" fontSize={10} fill="var(--ink-3)" fontFamily="Geist Mono, monospace">{v >= 1000 ? (v / 1000).toFixed(v % 1000 ? 1 : 0) + 'k' : Math.round(v)}</text></g>; })}
         {hourly.map((h, i) => {
           const x = L + i * bw + 1, w = bw - 2, bh = h.rev ? Math.max(3, ph * h.rev / max) : 0, y = T + ph - bh, r = Math.min(4, w / 2, bh);
           const active = hover?.i === i;
           return (
             <g key={i}>
-              {bh > 0 && <path d={`M${x} ${T + ph} V${y + r} Q${x} ${y} ${x + r} ${y} H${x + w - r} Q${x + w} ${y} ${x + w} ${y + r} V${T + ph} Z`} fill={active ? '#fcee0a' : '#c6ff3d'} opacity={hover && !active ? 0.55 : 1} />}
+              {bh > 0 && <path d={`M${x} ${T + ph} V${y + r} Q${x} ${y} ${x + r} ${y} H${x + w - r} Q${x + w} ${y} ${x + w} ${y + r} V${T + ph} Z`} fill="var(--ink)" opacity={hover && !active ? 0.3 : active ? 1 : 0.75} />}
               <rect data-i={i} x={L + i * bw} y={T} width={bw} height={ph} fill="transparent" />
-              {i % 3 === 0 && <text x={x + w / 2} y={H - 8} textAnchor="middle" fontSize={10} fill="#6b7598" fontFamily="JetBrains Mono, monospace">{String(h.h).padStart(2, '0')}</text>}
+              {i % 3 === 0 && <text x={x + w / 2} y={H - 8} textAnchor="middle" fontSize={10} fill="var(--ink-3)" fontFamily="Geist Mono, monospace">{String(h.h).padStart(2, '0')}</text>}
             </g>
           );
         })}
       </svg>
       {hover && hv && (
-        <div className="absolute pointer-events-none -translate-x-1/2 -translate-y-full panel rounded-xl px-3 py-2 text-xs shadow-2xl whitespace-nowrap" style={{ left: hover.x, top: hover.y - 12 }}>
+        <div className="absolute pointer-events-none -translate-x-1/2 -translate-y-full panel rounded-[16px] px-3 py-2 text-xs shadow-2xl whitespace-nowrap" style={{ left: hover.x, top: hover.y - 12 }}>
           <div className="font-mono c-ink3">{String(hv.h).padStart(2, '0')}:00–{String(hv.h).padStart(2, '0')}:59</div>
-          <div className="font-bold">{money(hv.rev)}</div><div className="c-ink3">{hv.n} заказ(ов)</div>
+          <div className="font-medium">{money(hv.rev)}</div><div className="c-ink3">{hv.n} заказ(ов)</div>
         </div>
       )}
     </div>
@@ -89,38 +89,38 @@ function Dashboard() {
     <div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {(s ? kpis : Array.from({ length: 4 }, () => null)).map((k, i) => (
-          <div key={i} className="glass rounded-3xl p-4">
-            {k ? <><div className="flex items-center justify-between text-xs c-ink3 font-bold"><span>{k[0]}</span>{(() => { const I = k[2]; return <I className={clsx('w-4 h-4', k[3])} />; })()}</div><div className="font-display font-bold text-2xl sm:text-3xl mt-2">{k[1]}</div></> : <><div className="skel h-3 w-1/2" /><div className="skel h-8 w-2/3 mt-3" /></>}
+          <div key={i} className="glass rounded-[30px] p-4">
+            {k ? <><div className="flex items-center justify-between text-xs c-ink3 font-medium"><span>{k[0]}</span>{(() => { const I = k[2]; return <I className={clsx('w-4 h-4', k[3])} />; })()}</div><div className="font-display text-2xl sm:text-3xl mt-2">{k[1]}</div></> : <><div className="skel h-3 w-1/2" /><div className="skel h-8 w-2/3 mt-3" /></>}
           </div>
         ))}
       </div>
       <div className="grid lg:grid-cols-[1.6fr_1fr] gap-4 mt-4">
-        <div className="glass rounded-3xl p-5">
-          <div className="flex items-center justify-between"><div><div className="font-bold">Выручка по часам, ₴</div><div className="text-xs c-ink3">Сегодня · наведите на столбец</div></div>{s && <div className="text-xs c-ink3 font-mono">начислено бонусов: +{fmt(s.bonusEarned)}</div>}</div>
+        <div className="glass rounded-[30px] p-5">
+          <div className="flex items-center justify-between"><div><div className="font-medium">Выручка по часам, ₴</div><div className="text-xs c-ink3">Сегодня · наведите на столбец</div></div>{s && <div className="text-xs c-ink3 font-mono">начислено бонусов: +{fmt(s.bonusEarned)}</div>}</div>
           {s ? <Chart hourly={s.hourly} /> : <div className="skel w-full aspect-[720/230] mt-4" />}
         </div>
-        <div className="glass rounded-3xl p-5">
-          <div className="font-bold">Топ товаров сегодня</div>
+        <div className="glass rounded-[30px] p-5">
+          <div className="font-medium">Топ товаров сегодня</div>
           <div className="mt-4 space-y-3">
-            {s?.top.map(t => <div key={t.productId}><div className="flex items-center gap-2 text-sm"><span>{t.emoji}</span><span className="flex-1 truncate">{t.name}</span><span className="font-mono text-xs c-ink2">{money(t.rev)}</span></div><div className="h-1.5 rounded-full bg-white/10 mt-1.5 overflow-hidden"><div className="h-full rounded-full bg-[var(--lime)]" style={{ width: `${t.rev / (s.top[0]?.rev || 1) * 100}%` }} /></div></div>)}
+            {s?.top.map(t => <div key={t.productId}><div className="flex items-center gap-2 text-sm"><span>{t.emoji}</span><span className="flex-1 truncate">{t.name}</span><span className="font-mono text-xs c-ink2">{money(t.rev)}</span></div><div className="h-1.5 rounded-full bg-[var(--track)] mt-1.5 overflow-hidden"><div className="h-full rounded-full bg-[var(--lime)]" style={{ width: `${t.rev / (s.top[0]?.rev || 1) * 100}%` }} /></div></div>)}
             {s && !s.top.length && <div className="text-sm c-ink3">Сегодня продаж ещё не было</div>}
           </div>
         </div>
       </div>
       <div className="grid lg:grid-cols-3 gap-4 mt-4">
-        <div className="glass rounded-3xl p-5">
-          <div className="font-bold mb-3">Заказы по статусам</div>
-          {s?.byStatus.map(b => <div key={b.status} className="flex items-center gap-3 py-2 border-b hairline last:border-0 text-sm"><span className="w-2.5 h-2.5 rounded-full" style={{ background: STATUS_COLORS[b.status] }} /><span className="flex-1">{STATUS_LABEL[b.status]}</span><span className="font-mono font-bold">{b.n}</span></div>)}
+        <div className="glass rounded-[30px] p-5">
+          <div className="font-medium mb-3">Заказы по статусам</div>
+          {s?.byStatus.map(b => <div key={b.status} className="flex items-center gap-3 py-2 border-b hairline last:border-0 text-sm"><span className="w-2.5 h-2.5 rounded-full" style={{ background: STATUS_COLORS[b.status] }} /><span className="flex-1">{STATUS_LABEL[b.status]}</span><span className="font-mono font-medium">{b.n}</span></div>)}
         </div>
-        <div className="glass rounded-3xl p-5">
-          <div className="font-bold mb-3 flex items-center gap-2"><TriangleAlert className="w-4 h-4 c-yellow" />Заканчиваются</div>
-          {s?.lowStock.map(p => <div key={p.id} className="flex items-center gap-3 py-2 border-b hairline last:border-0 text-sm"><span>{p.emoji}</span><span className="flex-1 truncate">{p.name}</span><span className={clsx('font-mono font-bold', p.stock ? 'c-yellow' : 'c-pink')}>{p.stock} шт</span></div>)}
+        <div className="glass rounded-[30px] p-5">
+          <div className="font-medium mb-3 flex items-center gap-2"><TriangleAlert className="w-4 h-4 c-yellow" />Заканчиваются</div>
+          {s?.lowStock.map(p => <div key={p.id} className="flex items-center gap-3 py-2 border-b hairline last:border-0 text-sm"><span>{p.emoji}</span><span className="flex-1 truncate">{p.name}</span><span className={clsx('font-mono font-medium', p.stock ? 'c-yellow' : 'c-pink')}>{p.stock} шт</span></div>)}
           {s && !s.lowStock.length && <div className="text-sm c-ink3">Все позиции в достатке</div>}
         </div>
-        <div className="glass rounded-3xl p-5">
-          <div className="font-bold mb-3 flex items-center gap-2"><Activity className="w-4 h-4 c-cyan" />Интеграции</div>
+        <div className="glass rounded-[30px] p-5">
+          <div className="font-medium mb-3 flex items-center gap-2"><Activity className="w-4 h-4 c-cyan" />Интеграции</div>
           {([['LiqPay', integrations?.liqpay], ['Новая Почта', integrations?.novaposhta], ['SMS Fly', integrations?.sms]] as const).map(([n, on]) => (
-            <div key={n} className="flex items-center gap-3 py-2 border-b hairline last:border-0 text-sm"><span className={clsx('pulse-dot', !on && '!bg-[var(--yellow)]')} /><span className="flex-1">{n}</span><span className={clsx('text-xs font-bold', on ? 'c-lime' : 'c-yellow')}>{on ? 'подключено' : 'мок (нет ключа)'}</span></div>
+            <div key={n} className="flex items-center gap-3 py-2 border-b hairline last:border-0 text-sm"><span className={clsx('pulse-dot', !on && '!bg-[var(--yellow)]')} /><span className="flex-1">{n}</span><span className={clsx('text-xs font-medium', on ? 'c-lime' : 'c-yellow')}>{on ? 'подключено' : 'мок (нет ключа)'}</span></div>
           ))}
           {s && <div className="mt-3 text-xs c-ink3">Отзывов на модерации: {s.pendingReviews}</div>}
         </div>
@@ -159,8 +159,8 @@ function Products() {
 
   return (
     <div>
-      <div className="glass rounded-3xl p-5">
-        <div className="font-bold mb-4 flex items-center gap-2"><Plus className="w-5 h-5 c-lime" />Новый товар</div>
+      <div className="glass rounded-[30px] p-5">
+        <div className="font-medium mb-4 flex items-center gap-2"><Plus className="w-5 h-5 c-lime" />Новый товар</div>
         <div className="grid grid-cols-2 md:grid-cols-6 gap-2">
           {F('emoji', { className: 'field text-center text-xl', maxLength: 4, 'aria-label': 'Эмодзи' })}
           <div className="md:col-span-2">{F('name', { placeholder: 'Название' })}</div>
@@ -175,24 +175,24 @@ function Products() {
           {F('tags', { placeholder: 'теги: веган, био' })}
         </div>
         <div className="flex items-center gap-3 mt-3">
-          <button onClick={add} disabled={!form.name || !form.price} className="btn-neon rounded-xl px-5 py-3 flex items-center gap-2"><Plus className="w-4 h-4" />Добавить</button>
+          <button onClick={add} disabled={!form.name || !form.price} className="btn-neon rounded-full px-5 py-3 flex items-center gap-2"><Plus className="w-4 h-4" />Добавить</button>
           {err && <span className="text-sm c-pink font-semibold">{err}</span>}
         </div>
       </div>
-      <div className="glass rounded-3xl mt-4 overflow-x-auto thin-scroll">
+      <div className="glass rounded-[30px] mt-4 overflow-x-auto thin-scroll">
         <table className="w-full text-sm min-w-[820px]">
           <thead className="text-xs c-ink3 text-left"><tr className="border-b hairline"><th className="p-3 pl-5">Товар</th><th className="p-3">Цена ₴</th><th className="p-3">Старая ₴</th><th className="p-3">Склад</th><th className="p-3">Бейдж</th><th className="p-3">Рейтинг</th><th className="p-3 pr-5 text-right">Действия</th></tr></thead>
           <tbody>
             {!list && [0, 1, 2, 3].map(i => <tr key={i}><td colSpan={7} className="p-3 px-5"><div className="skel h-8" /></td></tr>)}
             {list?.map(p => (
-              <tr key={p.id} className="border-b hairline last:border-0 hover:bg-white/[.03]">
+              <tr key={p.id} className="border-b hairline last:border-0 hover-soft">
                 <td className="p-3 pl-5"><div className="flex items-center gap-3"><span className="text-2xl">{p.emoji}</span><div className="min-w-0"><div className="font-semibold truncate max-w-[220px]">{p.name}</div><div className="text-[11px] c-ink3 font-mono">{p.barcode}</div></div></div></td>
                 <td className="p-3"><input type="number" min={1} defaultValue={p.price} onBlur={e => +e.target.value !== p.price && void patch(p, { price: +e.target.value })} className="field !py-1.5 !px-2 !w-24 font-mono !rounded-lg" aria-label="Цена" /></td>
                 <td className="p-3"><input type="number" min={0} defaultValue={p.old ?? ''} key={`old-${p.old}`} onBlur={e => { const v = e.target.value ? +e.target.value : null; if (v !== p.old) void patch(p, { old: v }); }} className="field !py-1.5 !px-2 !w-24 font-mono !rounded-lg" placeholder="—" aria-label="Старая цена" /></td>
                 <td className="p-3"><input type="number" min={0} defaultValue={p.stock} onBlur={e => +e.target.value !== p.stock && void patch(p, { stock: +e.target.value })} className={clsx('field !py-1.5 !px-2 !w-20 font-mono !rounded-lg', p.stock <= 5 && '!border-[var(--yellow)]')} aria-label="Склад" /></td>
                 <td className="p-3"><select value={p.badge} onChange={e => void patch(p, { badge: e.target.value })} className="field !py-1.5 !px-2 !w-28 !rounded-lg text-xs" aria-label="Бейдж"><option value="">—</option><option>Хит</option><option>Sale</option><option>New</option></select></td>
                 <td className="p-3 text-xs c-ink2">{p.rating.n ? `${p.rating.avg.toFixed(1)} (${p.rating.n})` : '—'}</td>
-                <td className="p-3 pr-5 text-right"><button onClick={() => del(p)} className={clsx('rounded-lg px-3 py-1.5 text-xs font-bold tr', confirm === p.id ? 'bg-[var(--pink)] text-white' : 'btn-ghost c-pink')}>{confirm === p.id ? 'Точно снять?' : 'Удалить'}</button></td>
+                <td className="p-3 pr-5 text-right"><button onClick={() => del(p)} className={clsx('rounded-full px-3 py-1.5 text-xs font-medium tr', confirm === p.id ? 'bg-[var(--pink)] text-[var(--ink)]' : 'btn-ghost c-pink')}>{confirm === p.id ? 'Точно снять?' : 'Удалить'}</button></td>
               </tr>
             ))}
           </tbody>
@@ -223,28 +223,28 @@ function Orders() {
       <div className="flex flex-wrap items-center gap-2">
         <input value={q} onChange={e => setQ(e.target.value)} className="field !w-auto flex-1 min-w-[200px]" placeholder="Поиск: номер, имя, телефон" />
         <select value={status} onChange={e => setStatus(e.target.value)} className="field !w-auto"><option value="all">Все статусы</option>{Object.entries(STATUS_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>
-        <button onClick={exportJson} className="btn-yellow rounded-xl px-4 py-3 text-sm flex items-center gap-2"><Download className="w-4 h-4" />Экспорт JSON</button>
+        <button onClick={exportJson} className="btn-yellow rounded-full px-4 py-3 text-sm flex items-center gap-2"><Download className="w-4 h-4" />Экспорт JSON</button>
       </div>
       <div className="mt-4 space-y-2">
-        {!list && [0, 1, 2, 3].map(n => <div key={n} className="glass rounded-2xl p-4 flex gap-4"><div className="skel h-10 w-28" /><div className="skel h-10 flex-1" /><div className="skel h-10 w-32" /></div>)}
+        {!list && [0, 1, 2, 3].map(n => <div key={n} className="glass rounded-[24px] p-4 flex gap-4"><div className="skel h-10 w-28" /><div className="skel h-10 flex-1" /><div className="skel h-10 w-32" /></div>)}
         {list?.map(o => {
           const idx = FLOW.indexOf(o.status);
           const locked = o.status === 'cancelled' || o.status === 'awaiting_payment';
           return (
-            <div key={o.id} className="glass rounded-2xl p-4 grid md:grid-cols-[160px_1fr_auto] gap-3 items-center">
-              <div><div className="font-mono font-bold">{o.id}</div><div className="text-[11px] c-ink3">{dt(o.createdAt)}</div></div>
+            <div key={o.id} className="glass rounded-[24px] p-4 grid md:grid-cols-[160px_1fr_auto] gap-3 items-center">
+              <div><div className="font-mono font-medium">{o.id}</div><div className="text-[11px] c-ink3">{dt(o.createdAt)}</div></div>
               <div className="min-w-0">
                 <div className="text-sm font-semibold truncate">{o.customer.name} · {o.customer.phone}</div>
                 <div className="text-xs c-ink3 truncate">{o.items.map(i => `${i.emoji}×${i.qty}`).join(' ')} · {o.delivery.label}</div>
-                <div className="text-xs mt-0.5"><span className="font-mono font-bold">{money(o.total)}</span>{o.bonusSpent > 0 && <span className="c-yellow"> · бонусы −{o.bonusSpent}</span>}<span className="c-ink3"> · {{ paid: 'оплачен', cod: 'при получении', pending: 'ждёт оплаты', failed: 'оплата не прошла', refunded: 'возврат' }[o.paymentStatus]}</span></div>
+                <div className="text-xs mt-0.5"><span className="font-mono font-medium">{money(o.total)}</span>{o.bonusSpent > 0 && <span className="c-yellow"> · бонусы −{o.bonusSpent}</span>}<span className="c-ink3"> · {{ paid: 'оплачен', cod: 'при получении', pending: 'ждёт оплаты', failed: 'оплата не прошла', refunded: 'возврат' }[o.paymentStatus]}</span></div>
               </div>
               <div className="flex items-center gap-2">
-                <div className="hidden sm:flex gap-1">{FLOW.map((s, i) => <span key={s} className="w-2.5 h-2.5 rounded-full" style={{ background: idx >= i ? STATUS_COLORS[s] : 'rgba(255,255,255,.12)' }} />)}</div>
-                <select value={o.status} disabled={o.status === 'cancelled'} onChange={e => void setOrderStatus(o, e.target.value)} className="field !py-2 !w-auto text-xs font-bold" style={{ color: STATUS_COLORS[o.status] }} aria-label="Статус">
+                <div className="hidden sm:flex gap-1">{FLOW.map((s, i) => <span key={s} className="w-2.5 h-2.5 rounded-full" style={{ background: idx >= i ? 'var(--ink)' : 'var(--track)' }} />)}</div>
+                <select value={o.status} disabled={o.status === 'cancelled'} onChange={e => void setOrderStatus(o, e.target.value)} className="field !py-2 !w-auto text-xs font-medium" style={{ color: STATUS_COLORS[o.status] }} aria-label="Статус">
                   {o.status === 'awaiting_payment' && <option value="awaiting_payment">Ожидает оплаты</option>}
                   {[...FLOW, 'cancelled'].map(s => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}
                 </select>
-                <button onClick={() => void setOrderStatus(o, FLOW[idx + 1])} disabled={locked || o.status === 'done'} className="btn-neon rounded-xl w-10 h-10 grid place-items-center" title="Следующий статус" aria-label="Следующий статус"><ChevronsRight className="w-4 h-4" /></button>
+                <button onClick={() => void setOrderStatus(o, FLOW[idx + 1])} disabled={locked || o.status === 'done'} className="btn-neon rounded-full w-10 h-10 grid place-items-center" title="Следующий статус" aria-label="Следующий статус"><ChevronsRight className="w-4 h-4" /></button>
               </div>
             </div>
           );
@@ -264,23 +264,23 @@ function Reviews({ onCount }: { onCount: (n: number) => void }) {
   const pending = list?.filter(r => r.status === 'pending') ?? [];
   return (
     <div>
-      <div className="font-bold mb-3 flex items-center gap-2">На модерации <span className="text-xs font-black px-2 rounded-full bg-[var(--yellow)] text-black">{pending.length}</span></div>
+      <div className="font-medium mb-3 flex items-center gap-2">На модерации <span className="text-xs font-semibold px-2 rounded-full bg-lime">{pending.length}</span></div>
       <div className="grid md:grid-cols-2 gap-3">
         {pending.map(r => (
-          <div key={r.id} className={clsx('glass rounded-2xl p-4', r.flagged && '!border-[var(--pink)]')}>
-            <div className="flex items-center gap-2 text-sm"><span className="text-xl">{r.product?.emoji}</span><span className="font-bold truncate">{r.product?.name}</span><span className="ml-auto"><Stars value={r.rating} size="w-3 h-3" /></span></div>
+          <div key={r.id} className={clsx('glass rounded-[24px] p-4', r.flagged && '!border-[var(--pink)]')}>
+            <div className="flex items-center gap-2 text-sm"><span className="text-xl">{r.product?.emoji}</span><span className="font-medium truncate">{r.product?.name}</span><span className="ml-auto"><Stars value={r.rating} size="w-3 h-3" /></span></div>
             <p className="text-sm c-ink2 mt-2">{r.text}</p>
-            <div className="flex flex-wrap items-center gap-2 mt-2 text-xs c-ink3"><span>{r.author}</span><span>{timeAgo(r.createdAt)}</span><span>{r.emojis.join(' ')}</span>{r.verified && <span className="c-lime">✓ покупатель</span>}{r.flagged && <span className="c-pink font-bold">⚠ подозрение на спам</span>}</div>
+            <div className="flex flex-wrap items-center gap-2 mt-2 text-xs c-ink3"><span>{r.author}</span><span>{timeAgo(r.createdAt)}</span><span>{r.emojis.join(' ')}</span>{r.verified && <span className="c-lime">✓ покупатель</span>}{r.flagged && <span className="c-pink font-medium">⚠ подозрение на спам</span>}</div>
             <div className="flex gap-2 mt-3">
-              <button onClick={() => approve(r)} className="btn-neon rounded-xl px-4 py-2 text-xs flex items-center gap-1.5"><Check className="w-3.5 h-3.5" />Одобрить</button>
-              <button onClick={() => del(r)} className="btn-ghost rounded-xl px-4 py-2 text-xs font-bold c-pink flex items-center gap-1.5"><Trash2 className="w-3.5 h-3.5" />Удалить</button>
+              <button onClick={() => approve(r)} className="btn-neon rounded-full px-4 py-2 text-xs flex items-center gap-1.5"><Check className="w-3.5 h-3.5" />Одобрить</button>
+              <button onClick={() => del(r)} className="btn-ghost rounded-full px-4 py-2 text-xs font-medium c-pink flex items-center gap-1.5"><Trash2 className="w-3.5 h-3.5" />Удалить</button>
             </div>
           </div>
         ))}
       </div>
-      {list && !pending.length && <div className="glass rounded-2xl p-8 text-center c-ink3">Очередь модерации пуста ✨</div>}
-      <div className="font-bold mt-8 mb-3">Опубликованные (последние 20)</div>
-      <div className="glass rounded-2xl divide-y divide-white/5">
+      {list && !pending.length && <div className="glass rounded-[24px] p-8 text-center c-ink3">Очередь модерации пуста ✨</div>}
+      <div className="font-medium mt-8 mb-3">Опубликованные (последние 20)</div>
+      <div className="glass rounded-[24px] divide-y divide-[var(--stroke)]">
         {list?.filter(r => r.status === 'approved').slice(0, 20).map(r => (
           <div key={r.id} className="p-3 flex items-center gap-3 text-sm">
             <span>{r.product?.emoji}</span><span className="flex-1 min-w-0 truncate c-ink2">{r.author}: {r.text}</span><Stars value={r.rating} size="w-3 h-3" />
@@ -301,18 +301,18 @@ export default function Admin() {
   useEffect(() => { if (authed) api.admin.get<Stats>('/admin/stats').then(s => setPending(s.pendingReviews)).catch(e => { if ((e as ApiError).status === 401) setAuthed(false); }); }, [authed]);
   if (!authed) return <Login onDone={() => setAuthed(true)} />;
   return (
-    <div className="min-h-screen" style={{ background: 'radial-gradient(80% 60% at 50% 0%, #0c1433, #04070f)' }}>
-      <div className="border-b hairline sticky top-0 z-20" style={{ background: 'rgba(4,7,18,.9)', backdropFilter: 'blur(16px)' }}>
+    <div className="min-h-screen relative"><div className="liquid" aria-hidden><i /><i /><i /><i /></div>
+      <div className="sticky top-0 z-20 glass !border-x-0 !border-t-0 !rounded-none">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
-          <span className="w-10 h-10 rounded-xl grid place-items-center bg-[var(--yellow)] text-black"><Terminal className="w-5 h-5" strokeWidth={2.4} /></span>
-          <div className="flex-1"><div className="font-display font-bold">NEON Admin</div><div className="text-[11px] c-ink3">Ctrl + Shift + A — назад в магазин</div></div>
-          <Link to="/" className="btn-ghost rounded-xl px-3 py-2 text-xs font-bold flex items-center gap-1.5"><Store className="w-3.5 h-3.5" /><span className="hidden sm:inline">Магазин</span></Link>
-          <button onClick={() => { tokens.admin = null; setAuthed(false); }} className="btn-ghost rounded-xl px-3 py-2 text-xs font-bold flex items-center gap-1.5" aria-label="Выйти"><LogOut className="w-3.5 h-3.5" /></button>
+          <span className="w-10 h-10 rounded-[16px] grid place-items-center bg-lime"><Terminal className="w-5 h-5" strokeWidth={2.4} /></span>
+          <div className="flex-1"><div className="font-display">NEON Admin</div><div className="text-[11px] c-ink3">Ctrl + Shift + A — назад в магазин</div></div>
+          <Link to="/" className="btn-ghost rounded-full px-3 py-2 text-xs font-medium flex items-center gap-1.5"><Store className="w-3.5 h-3.5" /><span className="hidden sm:inline">Магазин</span></Link>
+          <button onClick={() => { tokens.admin = null; setAuthed(false); }} className="btn-ghost rounded-full px-3 py-2 text-xs font-medium flex items-center gap-1.5" aria-label="Выйти"><LogOut className="w-3.5 h-3.5" /></button>
         </div>
         <div className="max-w-7xl mx-auto px-4 flex gap-1 overflow-x-auto no-scrollbar" role="tablist">
           {TABS.map(([id, Icon, label]) => (
-            <button key={id} role="tab" aria-selected={tab === id} onClick={() => { setTab(id); sfx.click(); }} className={clsx('shrink-0 px-4 py-3 text-sm font-bold flex items-center gap-2 border-b-2 -mb-px', tab === id ? 'border-[var(--lime)] c-lime' : 'border-transparent c-ink2 hover:text-white')}>
-              <Icon className="w-4 h-4" />{label}{id === 'reviews' && pending > 0 && <span className="text-[10px] font-black px-1.5 rounded-full bg-[var(--yellow)] text-black">{pending}</span>}
+            <button key={id} role="tab" aria-selected={tab === id} onClick={() => { setTab(id); sfx.click(); }} className={clsx('shrink-0 px-4 py-3 text-sm font-medium flex items-center gap-2 border-b-2 -mb-px', tab === id ? 'border-[var(--lime)] c-lime' : 'border-transparent c-ink2 hover:text-[var(--ink)]')}>
+              <Icon className="w-4 h-4" />{label}{id === 'reviews' && pending > 0 && <span className="text-[10px] font-semibold px-1.5 rounded-full bg-lime">{pending}</span>}
             </button>
           ))}
         </div>

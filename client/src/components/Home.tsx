@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import gsap from 'gsap';
-import { BookOpen, ChefHat, ChevronsRight, Clock, Flame, ListChecks, Sparkles, Users, Zap } from 'lucide-react';
+import { ArrowRight, ChevronsRight, Clock, Flame, Users } from 'lucide-react';
 import { useEffect, useRef, type PointerEvent } from 'react';
 import { addRecipe, recipeCalc } from '../lib/actions';
 import { money } from '../lib/format';
@@ -19,32 +19,22 @@ export function Hero() {
   const set = useUi(s => s.set);
   useEffect(() => {
     if (!ref.current || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const ctx = gsap.context(() => gsap.from('[data-intro]', { y: 34, opacity: 0, duration: 0.9, stagger: 0.08, ease: 'power3.out', clearProps: 'all' }), ref);
+    const ctx = gsap.context(() => gsap.from('[data-intro]', { y: 28, opacity: 0, filter: 'blur(8px)', duration: 1.4, stagger: 0.09, ease: 'expo.out', clearProps: 'all' }), ref);
     return () => ctx.revert();
   }, []);
   return (
-    <section className="max-w-7xl mx-auto px-4 pt-8 md:pt-12" ref={ref}>
-      <div className="relative rounded-[32px] overflow-hidden glass-2 p-6 sm:p-10 md:p-14">
-        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(60% 80% at 85% 30%, rgba(198,255,61,.16), transparent 60%), radial-gradient(50% 60% at 10% 100%, rgba(34,227,255,.12), transparent 60%)' }} />
-        <div className="absolute right-4 md:right-16 top-6 bottom-6 w-[46%] hidden md:block pointer-events-none select-none" aria-hidden>
-          {[['🥑', 110, '30%', '8%', 0, 'rgba(198,255,61,.35)'], ['🍓', 72, '70%', '0%', -2, 'rgba(255,61,129,.4)'], ['🍔', 88, '62%', '48%', -4, 'rgba(252,238,10,.35)'], ['🧃', 64, '14%', '58%', -1, 'rgba(34,227,255,.4)'], ['🥐', 54, '42%', '72%', -3, 'rgba(255,170,60,.3)']].map(([e, s, l, t, d, c]) => (
-            <span key={e as string} className="absolute float" style={{ fontSize: s as number, left: l as string, top: t as string, animationDelay: `${d}s`, filter: `drop-shadow(0 18px 26px ${c})` }}>{e}</span>
-          ))}
-        </div>
-        <div className="relative max-w-xl">
-          <div data-intro className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold chip on mb-5"><Zap className="w-3.5 h-3.5" />Доставка от 30 минут · 5 супермаркетов в Киеве</div>
-          <h1 data-intro className="font-display font-black text-[34px] leading-[1.05] sm:text-5xl md:text-6xl">Еда будущего<br /><span className="grad-text">в один клик</span></h1>
-          <p data-intro className="mt-5 text-base sm:text-lg c-ink2 max-w-md">Свежие продукты с доставкой: соберите блюдо свайпом, копите кэшбэк на голографической карте и оплачивайте за секунды.</p>
-          <div data-intro className="mt-7 flex flex-wrap gap-3">
-            <a href="#recipes" className="btn-neon rounded-2xl px-5 py-3.5 flex items-center gap-2"><ChefHat className="w-5 h-5" />Собрать блюдо</a>
-            <button onClick={() => { set({ mode: 'list' }); sfx.whoosh(); scrollTo({ top: 0 }); }} className="btn-ghost rounded-2xl px-5 py-3.5 font-bold flex items-center gap-2"><ListChecks className="w-5 h-5" />Режим супермаркета</button>
-          </div>
-          <div data-intro className="mt-8 grid grid-cols-3 gap-3 max-w-md">
-            <div className="glass rounded-2xl p-3"><div className="font-display font-bold text-xl c-lime">{count ?? '—'}</div><div className="text-[11px] c-ink3 font-semibold">товаров</div></div>
-            <div className="glass rounded-2xl p-3"><div className="font-display font-bold text-xl c-yellow">{Math.round(rate * 100)}%</div><div className="text-[11px] c-ink3 font-semibold">ваш кэшбэк</div></div>
-            <div className="glass rounded-2xl p-3"><div className="font-display font-bold text-xl c-cyan">30′</div><div className="text-[11px] c-ink3 font-semibold">доставка</div></div>
-          </div>
-        </div>
+    <section ref={ref} className="max-w-6xl mx-auto px-5 pt-32 md:pt-44 pb-10 md:pb-16 text-center">
+      <div data-intro className="eyebrow">Доставка от 30 минут · Киев и вся Украина</div>
+      <h1 data-intro className="font-display text-[44px] leading-[1.02] sm:text-7xl md:text-[92px] mt-6 chrome-text">Свежие продукты.<br />Ничего лишнего.</h1>
+      <p data-intro className="mt-7 text-base sm:text-lg c-ink2 max-w-xl mx-auto leading-relaxed">Соберите блюдо одним жестом, копите кэшбэк на стеклянной карте и оплачивайте за секунды.</p>
+      <div data-intro className="mt-10 flex flex-wrap justify-center gap-3">
+        <a href="#catalog" className="btn-neon rounded-full px-7 h-12 inline-flex items-center gap-2 text-[15px]">Перейти к покупкам <ArrowRight className="w-4 h-4" strokeWidth={1.75} /></a>
+        <button onClick={() => { set({ mode: 'list' }); sfx.whoosh(); scrollTo({ top: 0 }); }} className="btn-ghost rounded-full px-7 h-12 text-[15px]">Список покупок</button>
+      </div>
+      <div data-intro className="mt-16 flex justify-center gap-10 sm:gap-16 text-left">
+        {[[count ?? '—', 'товаров'], [`${Math.round(rate * 100)}%`, 'ваш кэшбэк'], ['30′', 'до двери']].map(([v, l]) => (
+          <div key={l}><div className="font-display text-3xl sm:text-4xl">{v}</div><div className="text-xs c-ink3 mt-1">{l}</div></div>
+        ))}
       </div>
     </section>
   );
@@ -55,16 +45,14 @@ export function Categories() {
   const cat = useFilters(s => s.cat), setF = useFilters(s => s.set);
   const pick = (id: string) => { setF({ cat: id }); sfx.click(); };
   return (
-    <section className="max-w-7xl mx-auto px-4 mt-8">
-      <div className="flex gap-2.5 overflow-x-auto no-scrollbar pb-1 -mx-4 px-4 snap-x">
-        <button onClick={() => pick('all')} className={clsx('chip snap-start shrink-0 rounded-2xl px-4 py-2.5 flex items-center gap-2 font-bold text-sm', cat === 'all' && 'on')}><span className="text-lg">🛸</span>Все</button>
-        {data?.categories.map(c => (
-          <button key={c.id} onClick={() => pick(c.id)} className={clsx('chip snap-start shrink-0 rounded-2xl px-4 py-2.5 flex items-center gap-2 font-bold text-sm', cat === c.id && 'on')}>
-            <span className="text-lg">{c.emoji}</span>{c.name}<span className="text-[11px] font-mono opacity-60">{data.products.filter(p => p.cat === c.id).length}</span>
-          </button>
-        ))}
-      </div>
-    </section>
+    <div className="flex gap-1 overflow-x-auto no-scrollbar -mx-5 px-5 pb-1">
+      <button onClick={() => pick('all')} className={clsx('chip shrink-0 rounded-full px-4 h-10 text-sm', cat === 'all' && 'on')}>Всё</button>
+      {data?.categories.map(c => (
+        <button key={c.id} onClick={() => pick(c.id)} className={clsx('chip shrink-0 rounded-full px-4 h-10 text-sm flex items-center gap-2', cat === c.id && 'on')}>
+          <span className="text-base">{c.emoji}</span>{c.name}
+        </button>
+      ))}
+    </div>
   );
 }
 
@@ -78,7 +66,7 @@ function SwipeToAdd({ recipe }: { recipe: Recipe }) {
     const move = (ev: globalThis.PointerEvent) => { dx = Math.min(max, Math.max(0, ev.clientX - x0)); knob.style.transform = `translateX(${dx}px)`; fill.style.width = dx + 56 + 'px'; };
     const up = () => {
       knob.removeEventListener('pointermove', move); knob.removeEventListener('pointerup', up); knob.removeEventListener('pointercancel', up);
-      knob.style.transition = 'transform .35s cubic-bezier(.4,0,.2,1)'; fill.style.transition = 'width .35s cubic-bezier(.4,0,.2,1)';
+      knob.style.transition = 'transform .7s cubic-bezier(.16,1,.3,1)'; fill.style.transition = 'width .7s cubic-bezier(.16,1,.3,1)';
       if (dx >= max * 0.8) {
         knob.style.transform = `translateX(${max}px)`; fill.style.width = '100%'; track.classList.add('done');
         addRecipe(recipe, knob);
@@ -90,8 +78,8 @@ function SwipeToAdd({ recipe }: { recipe: Recipe }) {
   return (
     <div className="swipe-track">
       <div className="swipe-fill" />
-      <div className="swipe-label">Свайп → всё в корзину</div>
-      <div className="swipe-knob" onPointerDown={onDown} role="slider" aria-valuenow={0} aria-label="Проведите вправо, чтобы добавить все ингредиенты"><ChevronsRight className="w-6 h-6" strokeWidth={2.6} /></div>
+      <div className="swipe-label">Проведите — всё в корзину</div>
+      <div className="swipe-knob" onPointerDown={onDown} role="slider" aria-valuenow={0} aria-label="Проведите вправо, чтобы добавить все ингредиенты"><ChevronsRight className="w-5 h-5" strokeWidth={1.75} /></div>
     </div>
   );
 }
@@ -99,49 +87,39 @@ function SwipeToAdd({ recipe }: { recipe: Recipe }) {
 function RecipeCard({ r }: { r: Recipe }) {
   const byId = useCatalog(s => s.byId);
   const lines = useCart(s => s.lines);
-  const rate = useSession(s => s.user?.tier.rate ?? 0.03);
   const set = useUi(s => s.set);
   const c = recipeCalc(r);
   const inCart = lines.some(l => l.bundle === r.id);
   return (
-    <article className="snap-start shrink-0 w-[86%] sm:w-[400px] rounded-[28px] glass-2 p-5 relative overflow-hidden flex flex-col">
-      <div className="absolute -right-10 -top-10 w-48 h-48 rounded-full blur-3xl opacity-50 pointer-events-none" style={{ background: r.tint }} />
-      <div className="relative flex items-start gap-4">
-        <div className="badge3d"><div className="orb w-20 h-20" style={{ ['--tint' as string]: r.tint }}><span className="emo text-5xl">{r.emoji}</span></div></div>
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2 mb-1.5"><span className="ribbon rb-sale">−{Math.round(r.discount * 100)}% набор</span>{inCart && <span className="ribbon rb-new">в корзине</span>}</div>
-          <h3 className="font-display font-bold text-lg leading-tight">{r.title}</h3>
-          <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-xs c-ink2 font-semibold">
-            <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{r.time} мин</span>
-            <span className="flex items-center gap-1"><Flame className="w-3.5 h-3.5" />{r.kcal} ккал</span>
-            <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" />{r.portions} порц.</span>
-            <span>{r.level}</span>
-          </div>
-        </div>
+    <article className="glass glass-i snap-start shrink-0 w-[86%] sm:w-[380px] rounded-[36px] p-7 flex flex-col">
+      <div className="flex items-start justify-between">
+        <div className="text-[72px] leading-none float" style={{ filter: 'drop-shadow(0 20px 22px rgba(0,0,0,.25))' }}>{r.emoji}</div>
+        <span className="ribbon">{inCart ? 'в корзине' : `−${Math.round(r.discount * 100)}% набор`}</span>
       </div>
-      <div className="relative mt-4 grid grid-cols-2 gap-1.5">
+      <h3 className="font-display text-2xl mt-6">{r.title}</h3>
+      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs c-ink3">
+        <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" strokeWidth={1.75} />{r.time} мин</span>
+        <span className="flex items-center gap-1.5"><Flame className="w-3.5 h-3.5" strokeWidth={1.75} />{r.kcal} ккал</span>
+        <span className="flex items-center gap-1.5"><Users className="w-3.5 h-3.5" strokeWidth={1.75} />{r.portions} порц.</span>
+      </div>
+      <div className="mt-6 flex flex-wrap gap-1.5">
         {r.items.map(it => {
           const p = byId.get(it.productId);
           const short = p ? p.stock - lines.filter(l => l.productId === p.id).reduce((s, l) => s + l.qty, 0) < it.qty : true;
-          return (
-            <button key={it.productId} disabled={!p} onClick={() => p && set({ productId: p.id })} className={clsx('flex items-center gap-2 rounded-xl bg-black/25 border hairline px-2 py-1.5 text-left hover:border-white/25', short && 'opacity-40')}>
-              <span className="text-lg">{p?.emoji ?? '❔'}</span>
-              <span className="min-w-0 flex-1"><span className="block text-xs font-semibold truncate">{p?.name ?? 'Нет в продаже'}</span><span className="block text-[10px] c-ink3">{p ? money(p.price) : ''}</span></span>
-            </button>
-          );
+          return <button key={it.productId} disabled={!p} onClick={() => p && set({ productId: p.id })} title={p?.name} className={clsx('chip rounded-full pl-2 pr-3 h-8 text-xs flex items-center gap-1.5 well', short && 'opacity-40')}><span className="text-sm">{p?.emoji ?? '·'}</span><span className="truncate max-w-[110px]">{p?.name.split(' ')[0] ?? '—'}</span></button>;
         })}
       </div>
-      <details className="relative mt-3">
-        <summary className="text-xs font-bold c-ink2 cursor-pointer list-none flex items-center gap-1.5 hover:text-white"><BookOpen className="w-3.5 h-3.5" />Как приготовить</summary>
-        <ol className="mt-2 space-y-1.5 text-sm c-ink2 list-decimal pl-5">{r.steps.map(s => <li key={s}>{s}</li>)}</ol>
+      <details className="mt-4 group">
+        <summary className="text-xs c-ink3 cursor-pointer list-none hover:text-[var(--ink)]">Как приготовить →</summary>
+        <ol className="mt-3 space-y-1.5 text-sm c-ink2 list-decimal pl-5">{r.steps.map(s => <li key={s}>{s}</li>)}</ol>
       </details>
-      <div className="relative mt-auto pt-4">
-        <div className="flex items-end justify-between mb-3">
-          <div><div className="text-xs c-ink3 line-through">{money(c.sum)}</div><div className="font-display font-bold text-2xl">{money(c.final)}</div></div>
-          <div className="text-right text-xs"><div className="c-pink font-bold">экономия {money(c.disc)}</div><div className="c-lime font-semibold">+{Math.floor(c.final * rate)} бонусов</div></div>
+      <div className="mt-auto pt-7">
+        <div className="flex items-baseline justify-between mb-4">
+          <div className="font-display text-3xl">{money(c.final)}</div>
+          <div className="text-xs c-ink3"><span className="line-through">{money(c.sum)}</span> · −{money(c.disc)}</div>
         </div>
         <SwipeToAdd recipe={r} />
-        <button onClick={e => addRecipe(r, e.currentTarget)} className="w-full mt-2 text-xs font-bold c-ink3 hover:text-[var(--lime)] py-1.5">или нажмите, чтобы добавить</button>
+        <button onClick={e => addRecipe(r, e.currentTarget)} className="w-full mt-2 text-xs c-ink3 hover:text-[var(--ink)] py-1.5">или нажмите</button>
       </div>
     </article>
   );
@@ -151,13 +129,13 @@ export function Recipes() {
   const recipes = useCatalog(s => s.data?.recipes);
   if (!recipes?.length) return null;
   return (
-    <section id="recipes" className="max-w-7xl mx-auto px-4 mt-12 scroll-mt-28">
-      <div className="mb-5">
-        <div className="text-xs font-bold c-lime tracking-[.2em] uppercase mb-2 flex items-center gap-2"><Sparkles className="w-4 h-4" />Smart Recipe-to-Cart</div>
-        <h2 className="font-display font-bold text-2xl sm:text-3xl">Соберите блюдо в 1 свайп</h2>
-        <p className="c-ink2 mt-1.5 text-sm">Все ингредиенты рецепта летят в корзину одним движением — со скидкой на набор.</p>
+    <section id="recipes" className="max-w-6xl mx-auto px-5 py-16 md:py-24 scroll-mt-24">
+      <div className="max-w-xl">
+        <div className="eyebrow">Рецепт в корзину</div>
+        <h2 className="font-display text-4xl md:text-5xl mt-4">Блюдо одним жестом</h2>
+        <p className="c-ink2 mt-4 leading-relaxed">Все ингредиенты рецепта — в корзину одним свайпом, со скидкой на набор.</p>
       </div>
-      <div className="flex gap-4 overflow-x-auto no-scrollbar snap-x snap-mandatory -mx-4 px-4 pb-4">{recipes.map(r => <RecipeCard key={r.id} r={r} />)}</div>
+      <div className="flex gap-5 overflow-x-auto no-scrollbar snap-x snap-mandatory -mx-5 px-5 pt-12 pb-8">{recipes.map(r => <RecipeCard key={r.id} r={r} />)}</div>
     </section>
   );
 }

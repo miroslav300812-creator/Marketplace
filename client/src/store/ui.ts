@@ -7,7 +7,7 @@ export type Toast = { id: string; type: 'ok' | 'info' | 'warn' | 'err' | 'sms' |
 type S = {
   mode: 'shop' | 'list'; listView: 'plan' | 'store';
   q: string; qd: string;
-  cartOpen: boolean; productId: number | null; loyaltyOpen: boolean; checkoutOpen: boolean;
+  searchOpen: boolean; cartOpen: boolean; productId: number | null; loyaltyOpen: boolean; checkoutOpen: boolean;
   ordersOpen: boolean; profileOpen: boolean; filtersOpen: boolean;
   pay: { order: Order; payment: Payment } | null; receipt: Order | null;
   toasts: Toast[];
@@ -20,7 +20,7 @@ const savedMode = (() => { try { return localStorage.getItem('nm_mode') === 'lis
 
 export const useUi = create<S>((set, get) => ({
   mode: savedMode, listView: 'plan', q: '', qd: '',
-  cartOpen: false, productId: null, loyaltyOpen: false, checkoutOpen: false, ordersOpen: false, profileOpen: false, filtersOpen: false,
+  searchOpen: false, cartOpen: false, productId: null, loyaltyOpen: false, checkoutOpen: false, ordersOpen: false, profileOpen: false, filtersOpen: false,
   pay: null, receipt: null, toasts: [],
   set: p => { set(p); if (p.mode) { try { localStorage.setItem('nm_mode', p.mode); } catch { /* ignore */ } } },
   toast: t => {
@@ -32,4 +32,4 @@ export const useUi = create<S>((set, get) => ({
 }));
 
 /** True while any overlay is open (used to lock page scroll). */
-export const useAnyOverlay = () => useUi(s => s.cartOpen || s.productId !== null || s.loyaltyOpen || s.checkoutOpen || s.ordersOpen || s.profileOpen || s.filtersOpen || !!s.pay || !!s.receipt);
+export const useAnyOverlay = () => useUi(s => s.searchOpen || s.cartOpen || s.productId !== null || s.loyaltyOpen || s.checkoutOpen || s.ordersOpen || s.profileOpen || s.filtersOpen || !!s.pay || !!s.receipt);

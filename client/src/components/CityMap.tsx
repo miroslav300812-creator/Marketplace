@@ -12,19 +12,19 @@ function rng(seed: number) {
 /** Static stylised city (blocks, river, avenues). Generated once; trusted markup. */
 function buildBase() {
   const r = rng(20260930);
-  let s = '<rect x="-50" y="-50" width="900" height="600" fill="#070d22"/>';
+  let s = '<rect x="-50" y="-50" width="900" height="600" class="m-bg"/>';
   for (let x = 8; x < 800; x += 46) for (let y = 8; y < 500; y += 38) {
     if (Math.abs(x + 20 - riverX(y + 16)) < 44) continue;
     const k = r();
-    s += `<rect x="${x}" y="${y}" width="${38 + Math.floor(r() * 3)}" height="${30 + Math.floor(r() * 3)}" rx="4" fill="${k < 0.08 ? '#0c2a24' : k < 0.3 ? '#0e1a3d' : '#0b1533'}" stroke="${k < 0.08 ? 'rgba(198,255,61,.14)' : 'rgba(120,140,220,.08)'}"/>`;
+    s += `<rect x="${x}" y="${y}" width="${38 + Math.floor(r() * 3)}" height="${30 + Math.floor(r() * 3)}" rx="6" class="${k < 0.08 ? 'm-park' : 'm-block'}"/>`;
   }
   let river = '';
   for (let y = -10; y <= 510; y += 10) river += (y === -10 ? 'M' : 'L') + riverX(y).toFixed(1) + ' ' + y + ' ';
-  s += `<path d="${river}" stroke="#0a2a4f" stroke-width="46" fill="none"/><path d="${river}" stroke="#0e3b6b" stroke-width="30" fill="none"/><path d="${river}" stroke="rgba(34,227,255,.35)" stroke-width="1.5" fill="none" class="dash-flow"/>`;
+  s += `<path d="${river}" class="m-river" stroke-width="46" stroke-linecap="round"/><path d="${river}" class="m-river-core" stroke-width="26" stroke-linecap="round"/>`;
   for (const d of ['M0 198 L800 186', 'M0 344 L800 356', 'M286 0 L300 500', 'M706 0 L690 500', 'M120 500 L470 0', 'M800 90 L560 500'])
-    s += `<path d="${d}" stroke="rgba(34,227,255,.08)" stroke-width="12" fill="none"/><path d="${d}" stroke="#23336a" stroke-width="4" fill="none"/>`;
+    s += `<path d="${d}" class="m-road" stroke-width="5"/>`;
   for (const [t, x, y] of [['ПОДОЛ', 368, 196], ['ЦЕНТР', 432, 318], ['ЛЕВЫЙ БЕРЕГ', 690, 160], ['ОБОЛОНЬ', 250, 32], ['ГОЛОСЕЕВО', 300, 472], ['ПЕЧЕРСК', 470, 400], ['ДАРНИЦА', 690, 430]])
-    s += `<text x="${x}" y="${y}" font-family="Unbounded, sans-serif" font-size="11" letter-spacing="3" fill="rgba(238,242,255,.2)" font-weight="700">${t}</text>`;
+    s += `<text x="${x}" y="${y}" class="m-label" font-size="10" letter-spacing="3" font-weight="500">${t}</text>`;
   return s;
 }
 
@@ -64,40 +64,40 @@ export function CityMap({ stores, mode, selectedStore, pin, coverage, onPin, onS
   };
 
   return (
-    <div className="relative rounded-3xl overflow-hidden border hairline" style={error ? { borderColor: 'var(--pink)' } : undefined}>
+    <div className="relative rounded-[30px] overflow-hidden glass" style={error ? { borderColor: 'var(--pink)' } : undefined}>
       <svg ref={svg} onClick={click} className="map-svg w-full aspect-[16/10] block" viewBox={`${x0} ${y0} ${w} ${h}`} preserveAspectRatio="xMidYMid slice" role="img" aria-label="Карта магазинов и зоны доставки">
         <g dangerouslySetInnerHTML={{ __html: base }} />
         {stores.map(s => {
-          const sel = mode === 'pickup' && selectedStore === s.id, col = sel ? '#fcee0a' : '#c6ff3d';
+          const sel = mode === 'pickup' && selectedStore === s.id, col = 'var(--ink)';
           return (
             <g key={s.id}>
-              {mode === 'courier' && <circle cx={s.x} cy={s.y} r={s.r} fill={`rgba(198,255,61,${near?.id === s.id ? 0.09 : 0.045})`} stroke={`rgba(198,255,61,${near?.id === s.id ? 0.6 : 0.3})`} strokeWidth={1.5} strokeDasharray="5 6" />}
+              {mode === 'courier' && <circle cx={s.x} cy={s.y} r={s.r} fill="var(--ink)" fillOpacity={near?.id === s.id ? 0.07 : 0.03} stroke="var(--ink)" strokeOpacity={near?.id === s.id ? 0.45 : 0.18} strokeWidth={1} strokeDasharray="3 6" />}
               <g className="store" data-store={s.id}>
                 <circle cx={s.x} cy={s.y} r={26} fill="transparent" />
-                <circle className="radar" cx={s.x} cy={s.y} r={16} fill="none" stroke={col} strokeWidth={2} />
-                <circle className="core" cx={s.x} cy={s.y} r={sel ? 11 : 8} fill={col} stroke="#060a18" strokeWidth={3} />
-                <text x={s.x} y={s.y - 17} textAnchor="middle" fontSize={11} fontWeight={800} fontFamily="Manrope, sans-serif" fill={sel ? '#fcee0a' : '#e9ffc4'} paintOrder="stroke" stroke="#060a18" strokeWidth={4}>{s.name.replace('NEON ', '')}</text>
+                <circle className="radar" cx={s.x} cy={s.y} r={16} fill="none" stroke={col} strokeWidth={1} />
+                <circle className="core" cx={s.x} cy={s.y} r={sel ? 9 : 6} fill={col} stroke="var(--bg)" strokeWidth={3} />
+                <text x={s.x} y={s.y - 17} textAnchor="middle" fontSize={11} fontWeight={sel ? 600 : 500} fill="var(--ink)" fillOpacity={sel ? 1 : 0.7} paintOrder="stroke" stroke="var(--bg)" strokeWidth={4}>{s.name.replace('NEON ', '')}</text>
               </g>
             </g>
           );
         })}
         {mode === 'courier' && pin && near && coverage && (
           <g key={`${pin.x}-${pin.y}`}>
-            <line x1={near.x} y1={near.y} x2={pin.x} y2={pin.y} stroke={coverage.inZone ? '#22e3ff' : '#ff3d81'} strokeWidth={2.5} className="dash-flow" />
-            <ellipse cx={pin.x} cy={pin.y} rx={8} ry={3} fill="rgba(0,0,0,.5)" />
+            <line x1={near.x} y1={near.y} x2={pin.x} y2={pin.y} stroke={coverage.inZone ? 'var(--ink)' : 'var(--danger)'} strokeWidth={1.5} className="dash-flow" />
+            <ellipse cx={pin.x} cy={pin.y} rx={8} ry={3} fill="var(--ink)" fillOpacity={0.2} />
             <g className="pin-drop">
-              <path d={`M${pin.x} ${pin.y} C ${pin.x - 5} ${pin.y - 10} ${pin.x - 13} ${pin.y - 16} ${pin.x - 13} ${pin.y - 25} A 13 13 0 1 1 ${pin.x + 13} ${pin.y - 25} C ${pin.x + 13} ${pin.y - 16} ${pin.x + 5} ${pin.y - 10} ${pin.x} ${pin.y} Z`} fill={coverage.inZone ? '#22e3ff' : '#ff3d81'} stroke="#060a18" strokeWidth={2.5} />
-              <circle cx={pin.x} cy={pin.y - 25} r={5} fill="#060a18" />
+              <path d={`M${pin.x} ${pin.y} C ${pin.x - 5} ${pin.y - 10} ${pin.x - 13} ${pin.y - 16} ${pin.x - 13} ${pin.y - 25} A 13 13 0 1 1 ${pin.x + 13} ${pin.y - 25} C ${pin.x + 13} ${pin.y - 16} ${pin.x + 5} ${pin.y - 10} ${pin.x} ${pin.y} Z`} fill={coverage.inZone ? 'var(--ink)' : 'var(--danger)'} stroke="var(--bg)" strokeWidth={2.5} />
+              <circle cx={pin.x} cy={pin.y - 25} r={5} fill="var(--bg)" />
             </g>
           </g>
         )}
-        {locating && <circle className="radar" cx={cx} cy={cy} r={120} fill="rgba(34,227,255,.08)" stroke="#22e3ff" strokeWidth={2} />}
+        {locating && <circle className="radar" cx={cx} cy={cy} r={120} fill="var(--ink)" fillOpacity={0.05} stroke="var(--ink)" strokeOpacity={0.4} strokeWidth={1} />}
       </svg>
-      <div className="absolute left-3 top-3 text-[11px] font-bold px-3 py-1.5 rounded-full bg-black/60 backdrop-blur flex items-center gap-1.5 pointer-events-none"><MapIcon className="w-3.5 h-3.5 c-lime" />{mode === 'courier' ? 'Нажмите на карту, чтобы поставить пин' : 'Выберите супермаркет'}</div>
+      <div className="absolute left-3 top-3 text-[11px] c-ink2 px-3 py-1.5 rounded-full glass flex items-center gap-1.5 pointer-events-none"><MapIcon className="w-3.5 h-3.5" />{mode === 'courier' ? 'Нажмите на карту, чтобы поставить пин' : 'Выберите супермаркет'}</div>
       <div className="absolute right-3 top-3 flex flex-col gap-1.5">
-        <button onClick={() => setZoom(z => Math.min(2.6, +(z + 0.4).toFixed(1)))} className="w-9 h-9 rounded-xl bg-black/60 backdrop-blur grid place-items-center hover:text-[var(--lime)]" aria-label="Приблизить"><ZoomIn className="w-4 h-4" /></button>
-        <button onClick={() => setZoom(z => Math.max(1, +(z - 0.4).toFixed(1)))} className="w-9 h-9 rounded-xl bg-black/60 backdrop-blur grid place-items-center hover:text-[var(--lime)]" aria-label="Отдалить"><ZoomOut className="w-4 h-4" /></button>
-        {mode === 'courier' && <button onClick={locate} className="w-9 h-9 rounded-xl bg-black/60 backdrop-blur grid place-items-center hover:text-[var(--lime)]" aria-label="Моё местоположение"><LocateFixed className="w-4 h-4" /></button>}
+        <button onClick={() => setZoom(z => Math.min(2.6, +(z + 0.4).toFixed(1)))} className="w-9 h-9 rounded-full glass grid place-items-center hover:text-[var(--ink)]" aria-label="Приблизить"><ZoomIn className="w-4 h-4" /></button>
+        <button onClick={() => setZoom(z => Math.max(1, +(z - 0.4).toFixed(1)))} className="w-9 h-9 rounded-full glass grid place-items-center hover:text-[var(--ink)]" aria-label="Отдалить"><ZoomOut className="w-4 h-4" /></button>
+        {mode === 'courier' && <button onClick={locate} className="w-9 h-9 rounded-full glass grid place-items-center hover:text-[var(--ink)]" aria-label="Моё местоположение"><LocateFixed className="w-4 h-4" /></button>}
       </div>
     </div>
   );

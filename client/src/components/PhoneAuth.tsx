@@ -58,16 +58,16 @@ export function PhoneAuth({ error, restored }: { error?: string; restored?: bool
   };
 
   return (
-    <div className="rounded-3xl glass p-4">
+    <div className="rounded-[30px] glass p-4">
       <div className="flex items-center justify-between gap-2">
-        <span className="text-xs font-bold c-ink3">Телефон · подтверждение по SMS</span>
-        {verified && <span className="text-xs font-bold c-lime flex items-center gap-1"><ShieldCheck className="w-4 h-4" />Подтверждён</span>}
+        <span className="text-xs font-medium c-ink3">Телефон · подтверждение по SMS</span>
+        {verified && <span className="text-xs font-medium c-lime flex items-center gap-1"><ShieldCheck className="w-4 h-4" />Подтверждён</span>}
       </div>
       <div className="flex gap-2 mt-2">
         <input value={profile.phone} onChange={e => setProfile({ phone: formatPhoneInput(e.target.value, profile.phone) })} onFocus={() => !profile.phone && setProfile({ phone: '+380 ' })}
           type="tel" inputMode="tel" autoComplete="tel" className={clsx('field font-mono flex-1', (err || error) && !sent && 'err', restored && profile.phone && 'restored')} placeholder="+380 XX XXX XX XX" aria-label="Телефон" />
         {!verified && (
-          <button onClick={send} disabled={!!busy || left > 0 || !phoneValid(profile.phone)} className="btn-neon rounded-xl px-4 text-sm min-w-[130px] grid place-items-center">
+          <button onClick={send} disabled={!!busy || left > 0 || !phoneValid(profile.phone)} className="btn-neon rounded-full px-4 text-sm min-w-[130px] grid place-items-center">
             {busy === 'send' ? <Spinner dark /> : left > 0 ? `Повтор ${left}с` : sent ? 'Отправить ещё' : 'Получить код'}
           </button>
         )}
@@ -79,7 +79,7 @@ export function PhoneAuth({ error, restored }: { error?: string; restored?: bool
             {code.map((c, i) => (
               <input key={i} ref={el => { refs.current[i] = el; }} value={c} onChange={e => onDigit(i, e.target.value)}
                 onKeyDown={e => { if (e.key === 'Backspace' && !code[i] && i > 0) { refs.current[i - 1]?.focus(); setCode(s => s.map((x, j) => (j === i - 1 ? '' : x))); } }}
-                inputMode="numeric" autoComplete="one-time-code" maxLength={4} className={clsx('field !w-14 !h-14 !p-0 text-center font-mono text-2xl font-bold', err && 'err')} aria-label={`Цифра ${i + 1}`} />
+                inputMode="numeric" autoComplete="one-time-code" maxLength={4} className={clsx('field !w-14 !h-14 !p-0 text-center font-mono text-2xl font-medium', err && 'err')} aria-label={`Цифра ${i + 1}`} />
             ))}
             {busy === 'verify' && <Spinner className="ml-2" />}
           </div>

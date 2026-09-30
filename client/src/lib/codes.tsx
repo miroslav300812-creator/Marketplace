@@ -56,5 +56,5 @@ export function QrMatrix({ seed, className = '' }: { seed: string; className?: s
     if (m[y][x] === 0) m[y][x] = r() < 0.52 ? 1 : 0;
     if (m[y][x] === 1 || m[y][x] === 2) cells.push(<rect key={y * N + x} x={x + 2} y={y + 2} width={1.02} height={1.02} />);
   }
-  return <svg viewBox={`0 0 ${N + 4} ${N + 4}`} className={className} shapeRendering="crispEdges" fill="#0b0f1e">{cells}</svg>;
+  return <svg viewBox={`0 0 ${N + 4} ${N + 4}`} className={className} shapeRendering="crispEdges" fill="currentColor">{cells}</svg>;
 }

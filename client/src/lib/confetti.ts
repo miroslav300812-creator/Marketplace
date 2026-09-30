@@ -1,5 +1,5 @@
 type Part = { x: number; y: number; vx: number; vy: number; w: number; h: number; rot: number; vr: number; tilt: number; color: string; circle: boolean; life: number; ttl: number };
-const COLORS = ['#c6ff3d', '#fcee0a', '#22e3ff', '#ff3d81', '#8b5cff', '#ffffff'];
+const COLORS = ['#ffffff', '#e8ebf0', '#c9d0dc', '#9aa3b2', '#d5e3f5', '#4a4e57'];
 const rand = (a: number, b: number) => a + Math.random() * (b - a);
 
 /** Canvas confetti drawn on a single full-screen canvas. */
